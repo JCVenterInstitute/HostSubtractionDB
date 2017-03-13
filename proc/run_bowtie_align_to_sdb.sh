@@ -1,6 +1,8 @@
 #!/bin/sh
 # Run bowtie2 to align reads to SDB.
 # SDB = Subtraction DataBase = reference human + cell-line-specific-contigs + phiX.
+# Assume the R1 and R2 reads of a pair have the same read name
+# Use this assumption to remove a read if its mate mapped to the SDB.
 
 HERE=`pwd`
 
@@ -115,16 +117,21 @@ BASE[12]=HUH7SEVNONE
 MYBASE=${BASE[${JOB}]}
 SAM=${MYBASE}.sam
 BAM=${MYBASE}.bam
-
+FASTQ1=${MYBASE}.R1.fastq
+FASTQ2=${MYBASE}.R2.fastq
 MYINDEX=${INDEX[${JOB}]}
 MYR1=${R1[${JOB}]}
 MYR2=${R2[${JOB}]}
+MYNAMES=${MYBASE}.read_names
 echo MYINDEX $MYINDEX
 echo MYR1 $MYR1
 echo MYR2 $MYR2
 echo MYBASE $MYBASE
 echo SAM $SAM
 echo BAM $BAM
+echo FASTQ1 $FASTQ1
+echo FASTQ2 $FASTQ2
+echo MYNAMES $MYNAMES
 
 function runit () {
     echo "RUN COMMAND"
@@ -163,11 +170,19 @@ CMD="${SAMTOOLS} sort -T ${TEMP} -l 9 -m 1G ${THREADS} -o R2.${BAM} R2.${SAM} "
 CMD="${SAMTOOLS} view -h -b -o R2.${BAM} R2.${SAM} "
 runit
 
+echo "GET MAPPED READ NAMES"
+# Later, use a command like this
+# sed 's/\/1$//'
+# to strip off any read-specific suffix like /1 or /2
+${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
+${SAMTOOLS} view R2.${BAM} | cut -f 1 >> ${MYNAMES}
+
+echo "SUBTRACT MAPPED READS"
 SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
 SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
-CMD="${SDB_UTIL} ${MYR1} R1.${BAM}"
+CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
 runit
-CMD="${SDB_UTIL} ${MYR2} R2.${BAM}"
+CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
 runit
 
 echo "OK TO DELETE SAM ONCE BAM HAS TESTED OK"
