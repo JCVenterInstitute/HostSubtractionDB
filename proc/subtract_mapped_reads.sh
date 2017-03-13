@@ -17,8 +17,8 @@
 # + ${SDB_HOME} environment variable
 # + ${SDB_HOME}/util/fastq-filter-by-name.pl
 
-SDB_HOME=`pwd`
-SDB_HOME="${SDB_HOME}/../util"
+BASEDIR=$(dirname "$0")
+SDB_HOME="${BASEDIR}/.."
 echo SDB_HOME $SDB_HOME
 UTILITY=${SDB_HOME}/util/fastq-filter-by-name.pl 
 echo UTILITY $UTILITY
@@ -29,7 +29,7 @@ echo SAMTOOLS $SAMTOOLS
 date
 READS_IN=$1
 MAPS_IN=$2
-READS_OUT=$1.SDB_filtered
+READS_OUT=$1.SDB_filtered.fastq
 echo READS_IN $READS_IN
 echo READS_OUT $READS_OUT
 ls -l $READS_IN
@@ -42,6 +42,7 @@ date
 echo "Get read names..."
 ${SAMTOOLS} view ${MAPS_IN} | cut -f 1 > ${TEMPFILE}
 echo -n $?; echo " exit status"
+ls -l ${TEMPFILE}
 date
 echo "Get reads..."
 EXCLUDE="-v"  # option to exclude the named reads

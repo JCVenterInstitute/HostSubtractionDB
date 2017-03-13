@@ -149,9 +149,9 @@ UNALIGNED="--un R1.${MYBASE}.u.fq"   # warning: bug
 UNALIGNED="--un R2.${MYBASE}.u.fq"
 UNALIGNED="--no-unal"                # keep unaligned out of the sam file
 CMD="${BOWTIE_ALIGN} ${UNALIGNED} ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${MYINDEX} -U ${MYR1} -S R1.${SAM}"
-##runit
+runit
 CMD="${BOWTIE_ALIGN} ${UNALIGNED} ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${MYINDEX} -U ${MYR2} -S R2.${SAM}"
-##runit
+runit
 
 echo "CONVERT SAM TO BAM"
 THREADS="-@ 4"
@@ -165,9 +165,9 @@ runit
 
 SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
 SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
-CMD=${SDB_UTIL} ${MYR1} R1.${BAM}
+CMD="${SDB_UTIL} ${MYR1} R1.${BAM}"
 runit
-CMD=${SDB_UTIL} ${MYR2} R2.${BAM}
+CMD="${SDB_UTIL} ${MYR2} R2.${BAM}"
 runit
 
 echo "OK TO DELETE SAM ONCE BAM HAS TESTED OK"
