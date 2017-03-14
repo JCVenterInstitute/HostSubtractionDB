@@ -11,6 +11,7 @@ HERE=`pwd`
 # Use small unless the target genome is > 4GB.
 # Our target genome is about 3 GB.
 export BOWTIE_ALIGN=/usr/local/bin/bowtie2
+export BOWTIE_BUILD=/usr/local/bin/bowtie2-build
 #export BOWTIE_ALIGN=/usr/local/bin/bowtie2-align-s
 #export BOWTIE_ALIGN=/usr/local/bin/bowtie2-align-l
 
@@ -22,6 +23,15 @@ source /usr/local/common/env/python.sh
 
 # This is the command for sorting bam files
 SAMTOOLS=/usr/local/bin/samtools
+
+function runit () {
+    echo "RUN COMMAND"
+    echo ${CMD}
+    date
+    nice ${CMD}
+    echo -n $?;    echo " exit status"
+    date
+}
 
 if [ -z ${SGE_TASK_ID} ]; then
     # This means we are not on the SGE grid.
@@ -35,14 +45,16 @@ fi
 
 if [ ${JOB} -eq 0 ]; then
     # Create the index, submit alignments to the grid, and stop.
-    date
-    echo "Bowtie index"
-    CMD="${BOWTIE_BUILD} ${MYTARGET} ${MYINDEX}"
-    #    echo CMD $CMD
-    #    COMMENDTED OUT BECAUSE WE ALREADY HAVE THE INDEXES
-    #    ${CMD}
-    #    echo -n $?; echo " exit status"
-    date
+    echo "Bowtie index 1"
+    CMD="${BOWTIE_BUILD} JURKAT.SDB.fasta.gz JURKAT"
+    runit
+    echo "Bowtie index 2"
+    CMD="${BOWTIE_BUILD} HUH7.SDB.fasta.gz HUH7"
+    runit
+    echo "Bowtie index 3"
+    CMD="${BOWTIE_BUILD} HEPG2.SDB.fasta.gz HEPG2"
+    runit
+    
     echo "Bowtie align on grid"
     CMD="${QSUB} -cwd -b n -A DHSSDB -P 8370 -N humanCL -pe threaded 4 -l medium -l memory=1g -t 1-12 -j y -o $HERE ${HERE}/run_bowtie_align_to_sdb.sh"
     echo $CMD
@@ -132,15 +144,6 @@ echo BAM $BAM
 echo FASTQ1 $FASTQ1
 echo FASTQ2 $FASTQ2
 echo MYNAMES $MYNAMES
-
-function runit () {
-    echo "RUN COMMAND"
-    echo ${CMD}
-    date
-    nice ${CMD}
-    echo -n $?;    echo " exit status"
-    date
-}
 
 THREADS="-p 4"
 #THREADS="-p 4 -mm"
