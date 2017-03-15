@@ -64,31 +64,31 @@ echo JOB $JOB
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
 
-R1[1]=nonvirus.HEPG2NONE.R1.fastq
-R1[2]=nonvirus.HEPG2RIBO.R1.fastq
-R1[3]=nonvirus.HEPG2SEVNONE.R1.fastq
-R1[4]=nonvirus.HEPG2SEVRIBO.R1.fastq
-R1[5]=nonvirus.HUH7NONE.R1.fastq
-R1[6]=nonvirus.HUH7RIBO.R1.fastq
-R1[7]=nonvirus.HUH7SEVNONE.R1.fastq
-R1[8]=nonvirus.HUH7SEVRIBO.R1.fastq
-R1[9]=nonvirus.JURKATCELLSSEVRIBO.R1.fastq
-R1[10]=nonvirus.JURKATNONE.R1.fastq
-R1[11]=nonvirus.JURKATRIBO.R1.fastq
-R1[12]=nonvirus.JURKATSEVNONE.R1.fastq
+R1[1]=trim.nonhost.HEPG2NONE.R1.fastq
+R1[2]=trim.nonhost.HEPG2RIBO.R1.fastq
+R1[3]=trim.nonhost.HEPG2SEVNONE.R1.fastq
+R1[4]=trim.nonhost.HEPG2SEVRIBO.R1.fastq
+R1[5]=trim.nonhost.HUH7NONE.R1.fastq
+R1[6]=trim.nonhost.HUH7RIBO.R1.fastq
+R1[7]=trim.nonhost.HUH7SEVNONE.R1.fastq
+R1[8]=trim.nonhost.HUH7SEVRIBO.R1.fastq
+R1[9]=trim.nonhost.JURKATCELLSSEVRIBO.R1.fastq
+R1[10]=trim.nonhost.JURKATNONE.R1.fastq
+R1[11]=trim.nonhost.JURKATRIBO.R1.fastq
+R1[12]=trim.nonhost.JURKATSEVNONE.R1.fastq
 
-R2[1]=nonvirus.HEPG2NONE.R2.fastq
-R2[2]=nonvirus.HEPG2RIBO.R2.fastq
-R2[3]=nonvirus.HEPG2SEVNONE.R2.fastq
-R2[4]=nonvirus.HEPG2SEVRIBO.R2.fastq
-R2[5]=nonvirus.HUH7NONE.R2.fastq
-R2[6]=nonvirus.HUH7RIBO.R2.fastq
-R2[7]=nonvirus.HUH7SEVNONE.R2.fastq
-R2[8]=nonvirus.HUH7SEVRIBO.R2.fastq
-R2[9]=nonvirus.JURKATCELLSSEVRIBO.R2.fastq
-R2[10]=nonvirus.JURKATNONE.R2.fastq
-R2[11]=nonvirus.JURKATRIBO.R2.fastq
-R2[12]=nonvirus.JURKATSEVNONE.R2.fastq
+R2[1]=trim.nonhost.HEPG2NONE.R2.fastq
+R2[2]=trim.nonhost.HEPG2RIBO.R2.fastq
+R2[3]=trim.nonhost.HEPG2SEVNONE.R2.fastq
+R2[4]=trim.nonhost.HEPG2SEVRIBO.R2.fastq
+R2[5]=trim.nonhost.HUH7NONE.R2.fastq
+R2[6]=trim.nonhost.HUH7RIBO.R2.fastq
+R2[7]=trim.nonhost.HUH7SEVNONE.R2.fastq
+R2[8]=trim.nonhost.HUH7SEVRIBO.R2.fastq
+R2[9]=trim.nonhost.JURKATCELLSSEVRIBO.R2.fastq
+R2[10]=trim.nonhost.JURKATNONE.R2.fastq
+R2[11]=trim.nonhost.JURKATRIBO.R2.fastq
+R2[12]=trim.nonhost.JURKATSEVNONE.R2.fastq
 
 BASE[1]=HEPG2NONE
 BASE[2]=HEPG2RIBO

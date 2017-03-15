@@ -64,31 +64,31 @@ echo JOB $JOB
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
 
-R1[1]=trim.nonhost.HEPG2NONE.R1.fastq
-R1[2]=trim.nonhost.HEPG2RIBO.R1.fastq
-R1[3]=trim.nonhost.HEPG2SEVNONE.R1.fastq
-R1[4]=trim.nonhost.HEPG2SEVRIBO.R1.fastq
-R1[5]=trim.nonhost.HUH7NONE.R1.fastq
-R1[6]=trim.nonhost.HUH7RIBO.R1.fastq
-R1[7]=trim.nonhost.HUH7SEVNONE.R1.fastq
-R1[8]=trim.nonhost.HUH7SEVRIBO.R1.fastq
-R1[9]=trim.nonhost.JURKATCELLSSEVRIBO.R1.fastq
-R1[10]=trim.nonhost.JURKATNONE.R1.fastq
-R1[11]=trim.nonhost.JURKATRIBO.R1.fastq
-R1[12]=trim.nonhost.JURKATSEVNONE.R1.fastq
+R1[1]=nonmyco.HEPG2NONE.R1.fastq
+R1[2]=nonmyco.HEPG2RIBO.R1.fastq
+R1[3]=nonmyco.HEPG2SEVNONE.R1.fastq
+R1[4]=nonmyco.HEPG2SEVRIBO.R1.fastq
+R1[5]=nonmyco.HUH7NONE.R1.fastq
+R1[6]=nonmyco.HUH7RIBO.R1.fastq
+R1[7]=nonmyco.HUH7SEVNONE.R1.fastq
+R1[8]=nonmyco.HUH7SEVRIBO.R1.fastq
+R1[9]=nonmyco.JURKATCELLSSEVRIBO.R1.fastq
+R1[10]=nonmyco.JURKATNONE.R1.fastq
+R1[11]=nonmyco.JURKATRIBO.R1.fastq
+R1[12]=nonmyco.JURKATSEVNONE.R1.fastq
 
-R2[1]=trim.nonhost.HEPG2NONE.R2.fastq
-R2[2]=trim.nonhost.HEPG2RIBO.R2.fastq
-R2[3]=trim.nonhost.HEPG2SEVNONE.R2.fastq
-R2[4]=trim.nonhost.HEPG2SEVRIBO.R2.fastq
-R2[5]=trim.nonhost.HUH7NONE.R2.fastq
-R2[6]=trim.nonhost.HUH7RIBO.R2.fastq
-R2[7]=trim.nonhost.HUH7SEVNONE.R2.fastq
-R2[8]=trim.nonhost.HUH7SEVRIBO.R2.fastq
-R2[9]=trim.nonhost.JURKATCELLSSEVRIBO.R2.fastq
-R2[10]=trim.nonhost.JURKATNONE.R2.fastq
-R2[11]=trim.nonhost.JURKATRIBO.R2.fastq
-R2[12]=trim.nonhost.JURKATSEVNONE.R2.fastq
+R2[1]=nonmyco.HEPG2NONE.R2.fastq
+R2[2]=nonmyco.HEPG2RIBO.R2.fastq
+R2[3]=nonmyco.HEPG2SEVNONE.R2.fastq
+R2[4]=nonmyco.HEPG2SEVRIBO.R2.fastq
+R2[5]=nonmyco.HUH7NONE.R2.fastq
+R2[6]=nonmyco.HUH7RIBO.R2.fastq
+R2[7]=nonmyco.HUH7SEVNONE.R2.fastq
+R2[8]=nonmyco.HUH7SEVRIBO.R2.fastq
+R2[9]=nonmyco.JURKATCELLSSEVRIBO.R2.fastq
+R2[10]=nonmyco.JURKATNONE.R2.fastq
+R2[11]=nonmyco.JURKATRIBO.R2.fastq
+R2[12]=nonmyco.JURKATSEVNONE.R2.fastq
 
 BASE[1]=HEPG2NONE
 BASE[2]=HEPG2RIBO
@@ -174,7 +174,7 @@ runit
 CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} ${OUTPUT}.${MYBASE}.R2.fastq"
 runit
 
-CMD="gzip -v $${OUTPUT}.{MYBASE}.R?.fastq"
+CMD="gzip -v ${OUTPUT}.${MYBASE}.*.fastq"
 runit
 
 echo "OK TO DELETE SAM ONCE BAM HAS TESTED OK"
