@@ -1,20 +1,15 @@
 #!/bin/sh
-# Run bowtie2 to align reads to SDB.
-# SDB = Subtraction DataBase = reference human + cell-line-specific-contigs + phiX.
+# Run bowtie2 to align reads to UNIVEC.
 # Assume the R1 and R2 reads of a pair have the same read name
-# Use this assumption to remove a read if its mate mapped to the SDB.
+# Use this assumption to remove a read if its mate mapped to the VIRUS.
 
 HERE=`pwd`
 THIS=`basename "$0"`
+OUTPUT="nonvec"
+rm -v ${OUTPUT}.*.fastq.gz
 
-# This is the command to align reads using the index.
-# The command has 'small' and 'large' binaries.
-# Use small unless the target genome is > 4GB.
-# Our target genome is about 3 GB.
 export BOWTIE_ALIGN=/usr/local/bin/bowtie2
 export BOWTIE_BUILD=/usr/local/bin/bowtie2-build
-#export BOWTIE_ALIGN=/usr/local/bin/bowtie2-align-s
-#export BOWTIE_ALIGN=/usr/local/bin/bowtie2-align-l
 
 # This is the command for grid submissions
 QSUB=/usr/local/sge_current/bin/lx-amd64/qsub
@@ -46,14 +41,9 @@ fi
 
 if [ ${JOB} -eq 0 ]; then
     # Create the index, submit alignments to the grid, and stop.
-    echo "Bowtie index 1"
-    CMD="${BOWTIE_BUILD} JURKAT.SDB.fasta.gz JURKAT"
-    runit
-    echo "Bowtie index 2"
-    CMD="${BOWTIE_BUILD} HUH7.SDB.fasta.gz HUH7"
-    runit
-    echo "Bowtie index 3"
-    CMD="${BOWTIE_BUILD} HEPG2.SDB.fasta.gz HEPG2"
+    date
+    echo "Bowtie index"
+    CMD="${BOWTIE_BUILD} UniVec.fasta UniVec"
     runit
     
     echo "Bowtie align on grid"
@@ -69,63 +59,62 @@ echo SGE_TASK_ID $SGE_TASK_ID
 JOB=$SGE_TASK_ID
 echo JOB $JOB
 
-# Note bowtie2 can take fastq or fastq.gz. Assume all gz.
+# Note bowtie2 can take fastq or fastq.gz. Assume gz.
 # If given a pair, bowtie will insist that both reads map and the pair is concordant.
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
 
-R1[1]=cutadapt.5JURKATRIBO_S11_R1_001.fastq
-R2[1]=cutadapt.5JURKATRIBO_S11_R2_001.fastq
-R1[2]=cutadapt.5JURKAT_S5_R1_001.fastq
-R2[2]=cutadapt.5JURKAT_S5_R2_001.fastq
-R1[3]=cutadapt.6JURKATCELLSSEVRIBOR_S12_R1_001.fastq
-R2[3]=cutadapt.6JURKATCELLSSEVRIBOR_S12_R2_001.fastq
-R1[4]=cutadapt.6JURKATSEV_S6_R1_001.fastq
-R2[4]=cutadapt.6JURKATSEV_S6_R2_001.fastq
+R1[1]=nonvirus.HEPG2NONE.R1.fastq
+R1[2]=nonvirus.HEPG2RIBO.R1.fastq
+R1[3]=nonvirus.HEPG2SEVNONE.R1.fastq
+R1[4]=nonvirus.HEPG2SEVRIBO.R1.fastq
+R1[5]=nonvirus.HUH7NONE.R1.fastq
+R1[6]=nonvirus.HUH7RIBO.R1.fastq
+R1[7]=nonvirus.HUH7SEVNONE.R1.fastq
+R1[8]=nonvirus.HUH7SEVRIBO.R1.fastq
+R1[9]=nonvirus.JURKATCELLSSEVRIBO.R1.fastq
+R1[10]=nonvirus.JURKATNONE.R1.fastq
+R1[11]=nonvirus.JURKATRIBO.R1.fastq
+R1[12]=nonvirus.JURKATSEVNONE.R1.fastq
 
-R1[5]=cutadapt.1HEPG2RIBO_S7_R1_001.fastq
-R2[5]=cutadapt.1HEPG2RIBO_S7_R2_001.fastq
-R1[6]=cutadapt.1HEPG2_S1_R1_001.fastq
-R2[6]=cutadapt.1HEPG2_S1_R2_001.fastq
-R1[7]=cutadapt.2HEPG2SEVRIBO_S8_R1_001.fastq
-R2[7]=cutadapt.2HEPG2SEVRIBO_S8_R2_001.fastq
-R1[8]=cutadapt.2HEPG2SEV_S2_R1_001.fastq
-R2[8]=cutadapt.2HEPG2SEV_S2_R2_001.fastq
+R2[1]=nonvirus.HEPG2NONE.R2.fastq
+R2[2]=nonvirus.HEPG2RIBO.R2.fastq
+R2[3]=nonvirus.HEPG2SEVNONE.R2.fastq
+R2[4]=nonvirus.HEPG2SEVRIBO.R2.fastq
+R2[5]=nonvirus.HUH7NONE.R2.fastq
+R2[6]=nonvirus.HUH7RIBO.R2.fastq
+R2[7]=nonvirus.HUH7SEVNONE.R2.fastq
+R2[8]=nonvirus.HUH7SEVRIBO.R2.fastq
+R2[9]=nonvirus.JURKATCELLSSEVRIBO.R2.fastq
+R2[10]=nonvirus.JURKATNONE.R2.fastq
+R2[11]=nonvirus.JURKATRIBO.R2.fastq
+R2[12]=nonvirus.JURKATSEVNONE.R2.fastq
 
-R1[9]=cutadapt.3HUH7RIBO_S9_R1_001.fastq
-R2[9]=cutadapt.3HUH7RIBO_S9_R2_001.fastq
-R1[10]=cutadapt.3HUH7_S3_R1_001.fastq
-R2[10]=cutadapt.3HUH7_S3_R2_001.fastq
-R1[11]=cutadapt.4HUH7SEVRIBO_S10_R1_001.fastq
-R2[11]=cutadapt.4HUH7SEVRIBO_S10_R2_001.fastq
-R1[12]=cutadapt.4HUH7SEV_S4_R1_001.fastq
-R2[12]=cutadapt.4HUH7SEV_S4_R2_001.fastq
+BASE[1]=HEPG2NONE
+BASE[2]=HEPG2RIBO
+BASE[3]=HEPG2SEVNONE
+BASE[4]=HEPG2SEVRIBO
+BASE[5]=HUH7NONE
+BASE[6]=HUH7RIBO
+BASE[7]=HUH7SEVNONE
+BASE[8]=HUH7SEVRIBO
+BASE[9]=JURKATCELLSSEVRIBO
+BASE[10]=JURKATNONE
+BASE[11]=JURKATRIBO
+BASE[12]=JURKATSEVNONE
 
-BASE[1]=JURKATRIBO
-BASE[2]=JURKATNONE
-BASE[3]=JURKATCELLSSEVRIBO
-BASE[4]=JURKATSEVNONE
-BASE[5]=HEPG2RIBO
-BASE[6]=HEPG2NONE
-BASE[7]=HEPG2SEVRIBO
-BASE[8]=HEPG2SEVNONE
-BASE[9]=HUH7RIBO 
-BASE[10]=HUH7NONE
-BASE[11]=HUH7SEVRIBO
-BASE[12]=HUH7SEVNONE
-
-INDEX[1]=JURKAT
-INDEX[2]=JURKAT
-INDEX[3]=JURKAT
-INDEX[4]=JURKAT
-INDEX[5]=HEPG2
-INDEX[6]=HEPG2
-INDEX[7]=HEPG2
-INDEX[8]=HEPG2
-INDEX[9]=HUH7
-INDEX[10]=HUH7
-INDEX[11]=HUH7
-INDEX[12]=HUH7
+INDEX[1]=UniVec
+INDEX[2]=UniVec
+INDEX[3]=UniVec
+INDEX[4]=UniVec
+INDEX[5]=UniVec
+INDEX[6]=UniVec
+INDEX[7]=UniVec
+INDEX[8]=UniVec
+INDEX[9]=UniVec
+INDEX[10]=UniVec
+INDEX[11]=UniVec
+INDEX[12]=UniVec
 
 MYBASE=${BASE[${JOB}]}
 SAM=${MYBASE}.sam
@@ -180,13 +169,13 @@ ${SAMTOOLS} view R2.${BAM} | cut -f 1 >> ${MYNAMES}
 echo "SUBTRACT MAPPED READS"
 SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
 SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
-CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
+CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} ${OUTPUT}.${MYBASE}.R1.fastq"
 runit
-CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
+CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} ${OUTPUT}.${MYBASE}.R2.fastq"
 runit
 
 echo "COMPRESS FASTQ"
-CMD="gzip -v *.fastq"
+CMD="gzip -v ${OUTPUT}.${MYBASE}.*.fastq"
 runit
 
 echo "DONE"

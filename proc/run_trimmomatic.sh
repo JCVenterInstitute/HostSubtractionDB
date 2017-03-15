@@ -7,7 +7,7 @@ JPATH=/usr/local/packages/trimmomatic-0.35
 #/usr/local/packages/trimmomatic-0.35/adapters/NexteraPE-PE.fa
 cp /usr/local/packages/trimmomatic-0.35/adapters/TruSeq3-SE.fa .
 																    
-for FF in *.fastq;
+for FF in *.fastq.gz;
 do
     
     INFILE=$FF

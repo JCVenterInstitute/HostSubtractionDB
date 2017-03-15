@@ -5,6 +5,8 @@
 
 HERE=`pwd`
 THIS=`basename "$0"`
+OUTPUT="nonvirus"
+rm -v ${OUTPUT}.*.fastq.gz
 
 export BOWTIE_ALIGN=/usr/local/bin/bowtie2
 export BOWTIE_BUILD=/usr/local/bin/bowtie2-build
@@ -57,7 +59,7 @@ echo SGE_TASK_ID $SGE_TASK_ID
 JOB=$SGE_TASK_ID
 echo JOB $JOB
 
-# Note bowtie2 can take fastq or fastq.gz
+# Note bowtie2 can take fastq or fastq.gz. Assume gz.
 # If given a pair, bowtie will insist that both reads map and the pair is concordant.
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
@@ -88,6 +90,19 @@ R2[10]=trim.nonhost.JURKATNONE.R2.fastq
 R2[11]=trim.nonhost.JURKATRIBO.R2.fastq
 R2[12]=trim.nonhost.JURKATSEVNONE.R2.fastq
 
+BASE[1]=HEPG2NONE
+BASE[2]=HEPG2RIBO
+BASE[3]=HEPG2SEVNONE
+BASE[4]=HEPG2SEVRIBO
+BASE[5]=HUH7NONE
+BASE[6]=HUH7RIBO
+BASE[7]=HUH7SEVNONE
+BASE[8]=HUH7SEVRIBO
+BASE[9]=JURKATCELLSSEVRIBO
+BASE[10]=JURKATNONE
+BASE[11]=JURKATRIBO
+BASE[12]=JURKATSEVNONE
+
 INDEX[1]=VIRUS
 INDEX[2]=VIRUS
 INDEX[3]=VIRUS
@@ -101,27 +116,12 @@ INDEX[10]=VIRUS
 INDEX[11]=VIRUS
 INDEX[12]=VIRUS
 
-BASE[1]=JURKATRIBO
-BASE[2]=JURKATNONE
-BASE[3]=JURKATCELLSSEVRIBO
-BASE[4]=JURKATSEVNONE
-BASE[5]=HEPG2RIBO
-BASE[6]=HEPG2NONE
-BASE[7]=HEPG2SEVRIBO
-BASE[8]=HEPG2SEVNONE
-BASE[9]=HUH7RIBO 
-BASE[10]=HUH7NONE
-BASE[11]=HUH7SEVRIBO
-BASE[12]=HUH7SEVNONE
-
 MYBASE=${BASE[${JOB}]}
 SAM=${MYBASE}.sam
 BAM=${MYBASE}.bam
-FASTQ1=${MYBASE}.R1.fastq
-FASTQ2=${MYBASE}.R2.fastq
 MYINDEX=${INDEX[${JOB}]}
-MYR1=${R1[${JOB}]}
-MYR2=${R2[${JOB}]}
+MYR1=${R1[${JOB}]}.gz
+MYR2=${R2[${JOB}]}.gz
 MYNAMES=${MYBASE}.read_names
 echo MYINDEX $MYINDEX
 echo MYR1 $MYR1
@@ -129,8 +129,6 @@ echo MYR2 $MYR2
 echo MYBASE $MYBASE
 echo SAM $SAM
 echo BAM $BAM
-echo FASTQ1 $FASTQ1
-echo FASTQ2 $FASTQ2
 echo MYNAMES $MYNAMES
 
 THREADS="-p 4"
@@ -171,9 +169,12 @@ ${SAMTOOLS} view R2.${BAM} | cut -f 1 >> ${MYNAMES}
 echo "SUBTRACT MAPPED READS"
 SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
 SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
-CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonvirus.${MYBASE}.R1.fastq"
+CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} ${OUTPUT}.${MYBASE}.R1.fastq"
 runit
-CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonvirus.${MYBASE}.R2.fastq"
+CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} ${OUTPUT}.${MYBASE}.R2.fastq"
+runit
+
+CMD="gzip -v $${OUTPUT}.{MYBASE}.R?.fastq"
 runit
 
 echo "OK TO DELETE SAM ONCE BAM HAS TESTED OK"
