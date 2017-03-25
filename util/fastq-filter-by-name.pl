@@ -68,6 +68,7 @@ sub process () {
 	    die ("Unexpected: state=$state");
 	}
     }
+    die ("Nothing read from STDIN") if ($state==0);
     die ("Unexpected termainal state: $state") unless ($state==4);
 }
 
