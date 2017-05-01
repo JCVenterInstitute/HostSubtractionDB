@@ -158,15 +158,16 @@ CMD="${SAMTOOLS} view -h -b -o R2.${BAM} R2.${SAM} "
 runit
 
 echo "GET MAPPED READ NAMES"
-# Later, use a command like this
+# If necessary, use a command like this
 # sed 's/\/1$//'
 # to strip off any read-specific suffix like /1 or /2
-${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
-${SAMTOOLS} view R2.${BAM} | cut -f 1 >> ${MYNAMES}
+# ${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
 
 echo "SUBTRACT MAPPED READS"
+${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
 CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
 runit
+${SAMTOOLS} view R2.${BAM} | cut -f 1  > ${MYNAMES}
 CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
 runit
 
