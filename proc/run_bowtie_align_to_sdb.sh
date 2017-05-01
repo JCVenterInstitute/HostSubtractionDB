@@ -1,11 +1,16 @@
 #!/bin/sh
-# Run bowtie2 to align reads to SDB.
-# SDB = Subtraction DataBase = reference human + cell-line-specific-contigs + phiX.
-# Assume the R1 and R2 reads of a pair have the same read name
-# Use this assumption to remove a read if its mate mapped to the SDB.
+# Run bowtie2.
+# Align raw reads.
+# Align to all references.
+
+# Special case handling required for timmomatic outputs:
+# Process the R1 and R2 that are still paired.
+# Process the R1 and R2 that are no longer paired.
 
 HERE=`pwd`
 THIS=`basename "$0"`
+SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
+SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
 
 # This is the command to align reads using the index.
 # The command has 'small' and 'large' binaries.
@@ -44,20 +49,16 @@ else
     JOB=${SGE_TASK_ID}
 fi
 
+INDEX=SDB
+MYINDEX=${INDEX}
+
 if [ ${JOB} -eq 0 ]; then
     # Create the index, submit alignments to the grid, and stop.
-    echo "Bowtie index 1"
-    CMD="${BOWTIE_BUILD} JURKAT.SDB.fasta.gz JURKAT"
+    echo "Bowtie index"
+    CMD="${BOWTIE_BUILD} phiX.fasta,UniVec.fasta,clean.hepg2_unmapped_contigs.fasta,clean.huh7_unmapped_contigs.fasta,clean.jurkat_unmapped_contigs.fasta,Mycoplasma.remove_blanks.fasta,GCA_000001405.22_GRCh38.p7_genomic.fasta ${INDEX}"
     runit
-    echo "Bowtie index 2"
-    CMD="${BOWTIE_BUILD} HUH7.SDB.fasta.gz HUH7"
-    runit
-    echo "Bowtie index 3"
-    CMD="${BOWTIE_BUILD} HEPG2.SDB.fasta.gz HEPG2"
-    runit
-    
     echo "Bowtie align on grid"
-    CMD="${QSUB} -cwd -b n -A DHSSDB -P 8370 -N humanCL -pe threaded 4 -l medium -l memory=1g -t 1-12 -j y -o $HERE ${HERE}/${THIS}"
+    CMD="${QSUB} -cwd -b n -A DHSSDB -P 8370 -N human1 -pe threaded 4 -l medium -l memory=1g -t 1-12 -j y -o $HERE ${HERE}/${THIS}"
     echo $CMD
     $CMD
     echo "Jobs sent to grid"
@@ -74,63 +75,49 @@ echo JOB $JOB
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
 
-R1[1]=cutadapt.5JURKATRIBO_S11_R1_001.fastq
-R2[1]=cutadapt.5JURKATRIBO_S11_R2_001.fastq
-R1[2]=cutadapt.5JURKAT_S5_R1_001.fastq
-R2[2]=cutadapt.5JURKAT_S5_R2_001.fastq
-R1[3]=cutadapt.6JURKATCELLSSEVRIBOR_S12_R1_001.fastq
-R2[3]=cutadapt.6JURKATCELLSSEVRIBOR_S12_R2_001.fastq
-R1[4]=cutadapt.6JURKATSEV_S6_R1_001.fastq
-R2[4]=cutadapt.6JURKATSEV_S6_R2_001.fastq
+R1[1]=5JURKATRIBO_S11_R1_001.fastq
+R2[1]=5JURKATRIBO_S11_R2_001.fastq
+R1[2]=5JURKAT_S5_R1_001.fastq
+R2[2]=5JURKAT_S5_R2_001.fastq
+R1[3]=6JURKATCELLSSEVRIBOR_S12_R1_001.fastq
+R2[3]=6JURKATCELLSSEVRIBOR_S12_R2_001.fastq
+R1[4]=6JURKATSEV_S6_R1_001.fastq
+R2[4]=6JURKATSEV_S6_R2_001.fastq
 
-R1[5]=cutadapt.1HEPG2RIBO_S7_R1_001.fastq
-R2[5]=cutadapt.1HEPG2RIBO_S7_R2_001.fastq
-R1[6]=cutadapt.1HEPG2_S1_R1_001.fastq
-R2[6]=cutadapt.1HEPG2_S1_R2_001.fastq
-R1[7]=cutadapt.2HEPG2SEVRIBO_S8_R1_001.fastq
-R2[7]=cutadapt.2HEPG2SEVRIBO_S8_R2_001.fastq
-R1[8]=cutadapt.2HEPG2SEV_S2_R1_001.fastq
-R2[8]=cutadapt.2HEPG2SEV_S2_R2_001.fastq
+R1[5]=1HEPG2RIBO_S7_R1_001.fastq
+R2[5]=1HEPG2RIBO_S7_R2_001.fastq
+R1[6]=1HEPG2_S1_R1_001.fastq
+R2[6]=1HEPG2_S1_R2_001.fastq
+R1[7]=2HEPG2SEVRIBO_S8_R1_001.fastq
+R2[7]=2HEPG2SEVRIBO_S8_R2_001.fastq
+R1[8]=2HEPG2SEV_S2_R1_001.fastq
+R2[8]=2HEPG2SEV_S2_R2_001.fastq
 
-R1[9]=cutadapt.3HUH7RIBO_S9_R1_001.fastq
-R2[9]=cutadapt.3HUH7RIBO_S9_R2_001.fastq
-R1[10]=cutadapt.3HUH7_S3_R1_001.fastq
-R2[10]=cutadapt.3HUH7_S3_R2_001.fastq
-R1[11]=cutadapt.4HUH7SEVRIBO_S10_R1_001.fastq
-R2[11]=cutadapt.4HUH7SEVRIBO_S10_R2_001.fastq
-R1[12]=cutadapt.4HUH7SEV_S4_R1_001.fastq
-R2[12]=cutadapt.4HUH7SEV_S4_R2_001.fastq
+R1[9]=3HUH7RIBO_S9_R1_001.fastq
+R2[9]=3HUH7RIBO_S9_R2_001.fastq
+R1[10]=3HUH7_S3_R1_001.fastq
+R2[10]=3HUH7_S3_R2_001.fastq
+R1[11]=4HUH7SEVRIBO_S10_R1_001.fastq
+R2[11]=4HUH7SEVRIBO_S10_R2_001.fastq
+R1[12]=4HUH7SEV_S4_R1_001.fastq
+R2[12]=4HUH7SEV_S4_R2_001.fastq
 
-BASE[1]=JURKATRIBO
-BASE[2]=JURKATNONE
-BASE[3]=JURKATCELLSSEVRIBO
-BASE[4]=JURKATSEVNONE
-BASE[5]=HEPG2RIBO
-BASE[6]=HEPG2NONE
-BASE[7]=HEPG2SEVRIBO
-BASE[8]=HEPG2SEVNONE
-BASE[9]=HUH7RIBO 
-BASE[10]=HUH7NONE
-BASE[11]=HUH7SEVRIBO
-BASE[12]=HUH7SEVNONE
-
-INDEX[1]=JURKAT
-INDEX[2]=JURKAT
-INDEX[3]=JURKAT
-INDEX[4]=JURKAT
-INDEX[5]=HEPG2
-INDEX[6]=HEPG2
-INDEX[7]=HEPG2
-INDEX[8]=HEPG2
-INDEX[9]=HUH7
-INDEX[10]=HUH7
-INDEX[11]=HUH7
-INDEX[12]=HUH7
+BASE[1]=JUR.RIBO.MOCK
+BASE[2]=JUR.NONE.MOCK
+BASE[3]=JUR.RIBO.SEND
+BASE[4]=JUR.NONE.SEND
+BASE[5]=HEP.RIBO.MOCK
+BASE[6]=HEP.NONE.MOCK
+BASE[7]=HEP.RIBO.SEND
+BASE[8]=HEP.NONE.SEND
+BASE[9]=HUH.RIBO.MOCK 
+BASE[10]=HUH.NONE.MOCK
+BASE[11]=HUH.RIBO.SEND
+BASE[12]=HUH.NONE.SEND
 
 MYBASE=${BASE[${JOB}]}
 SAM=${MYBASE}.sam
 BAM=${MYBASE}.bam
-MYINDEX=${INDEX[${JOB}]}
 MYR1=${R1[${JOB}]}.gz
 MYR2=${R2[${JOB}]}.gz
 MYNAMES=${MYBASE}.read_names
@@ -178,15 +165,15 @@ ${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
 ${SAMTOOLS} view R2.${BAM} | cut -f 1 >> ${MYNAMES}
 
 echo "SUBTRACT MAPPED READS"
-SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
-SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
 CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
 runit
 CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
 runit
 
 echo "COMPRESS FASTQ"
-CMD="gzip -v *.fastq"
+CMD="gzip -v nonhost.${MYBASE}.R1.fastq"
+runit
+CMD="gzip -v nonhost.${MYBASE}.R2.fastq"
 runit
 
 echo "DONE"
