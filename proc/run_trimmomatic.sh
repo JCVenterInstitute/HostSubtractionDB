@@ -1,12 +1,21 @@
 #!/bin/sh
 
 JPATH=/usr/local/packages/trimmomatic-0.35
+APATH="adapters"
+ADAPT="TruSeq3-SE.fa"
+echo "LOOKING FOR PROGRAM JAR FILE AND ADAPTER FILE"
+echo JPATH ${JPATH}
+echo APATH ${APATH}
+echo ADAPT ${ADAPT}
+# Trimmomatic expects adapter sequence in current directory.
+# Choices include: TruSeq3-SE.fa TruSeq3-PE.fa NexteraPE-PE.fa
 
-#/usr/local/packages/trimmomatic-0.35/adapters/TruSeq3-SE.fa
-#/usr/local/packages/trimmomatic-0.35/adapters/TruSeq3-PE.fa
-#/usr/local/packages/trimmomatic-0.35/adapters/NexteraPE-PE.fa
-cp /usr/local/packages/trimmomatic-0.35/adapters/TruSeq3-SE.fa .
-																    
+cp -v ${JPATH}/${APATH}/${ADAPT} .
+
+PATTERN="*.fastq.gz"
+echo "WORKING ON FILES LIKE"
+echo PATTERN ${PATTERN}
+
 for FF in *.fastq.gz;
 do
     
@@ -20,3 +29,4 @@ do
     echo -n $?; echo " exit status"
     date
 done
+echo "DONE"
