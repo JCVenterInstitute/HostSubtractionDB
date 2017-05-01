@@ -164,9 +164,10 @@ echo "SUBTRACT MAPPED READS"
 ${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
 CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
 runit
-${SAMTOOLS} view R2.${BAM} | cut -f 1  > ${MYNAMES}
+${SAMTOOLS} view R2.${BAM} | cut -f 1  > ${MYNAMES}   # overwrite
 CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
 runit
+rm ${MYNAMES} # cleanup
 
 echo "COMPRESS FASTQ"
 CMD="gzip -v nonhost.${MYBASE}.R1.fastq"
