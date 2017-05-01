@@ -64,10 +64,7 @@ if [ ${JOB} -eq 0 ]; then
     echo "Jobs sent to grid"
     exit
 fi
-
-# Do this when using the -t option on qsub.
 echo SGE_TASK_ID $SGE_TASK_ID
-JOB=$SGE_TASK_ID
 echo JOB $JOB
 
 # Note bowtie2 can take fastq or fastq.gz. Assume all gz.
