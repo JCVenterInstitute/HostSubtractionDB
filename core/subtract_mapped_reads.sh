@@ -1,18 +1,17 @@
 #!/bin/sh
 
-if [ $# != 4 ]; then echo "Usage: $0 <R1> <R2> <BAM> <out>"; exit 1; fi
-IN_R1=$1
-IN_R2=$2
-IN_BAM=$3
-OUT_PREFIX=$4
+if [ $# != 5 ]; then echo "Usage: $0 <scripthome> <R1> <R2> <BAM> <out>"; exit 1; fi
+DIR=$1
+IN_R1=$2
+IN_R2=$3
+IN_BAM=$4
+OUT_PREFIX=$5
 OUT_R1=${OUT_PREFIX}.${IN_R1}
 OUT_R2=${OUT_PREFIX}.${IN_R2}
 
 HERE=`pwd`
 echo "CURRENT DIRECTORY ${HERE}"
-BASE=`basename "$0"`
-echo "THIS PROGRAM IS ${BASE}"
-DIR=`dirname "$0"`
+echo "THIS SCRIPT $0"
 if [ "${DIR}" == "." ]; then
     echo "ERROR SCRIPT MUST BE INVOKED WITH ABSOLUTE PATH"
     exit 2

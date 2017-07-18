@@ -58,7 +58,7 @@ for FF in ${BASE_PATTERN}.${READS_SUFFIX} ; do
     R2=`echo ${R1} | sed 's/_R1_/_R2_/'`
     BAM=`echo ${R1} | sed "s/.${READS_SUFFIX}/.${MAP_SUFFIX}/"`
     echo R1 $R1 R2 $R2 BAM $BAM
-    CMD="${QSUB} -o $HERE ${DIR}/${SCRIPT} ${R1} ${R2} ${BAM} ${OUT_PREFIX}"
+    CMD="${QSUB} -o ${HERE} ${DIR}/${SCRIPT} ${DIR} ${R1} ${R2} ${BAM} ${OUT_PREFIX}"
     echo "GRID SUBMIT"
     echo $CMD
     runit
