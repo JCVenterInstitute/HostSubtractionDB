@@ -6,7 +6,7 @@ INDEXNAME=$2  # do not include .bt2
 
 if [ $# != 2 ]
 then
-    echo "Usage: 2 parameters"
+    echo "Usage: $0 <reads_suffix> <index_prefix>"
     exit 1
 fi
 echo FILESUFFIX $FILESUFFIX
@@ -17,12 +17,23 @@ echo INDEXNAME $INDEXNAME
 # Process the R1 and R2 that are no longer paired.
 
 HERE=`pwd`
+echo CURRENT DIRECTORY $HERE
 BASE=`basename "$0"`
+echo THIS PROGRAM IS $BASE
 DIR=`dirname "$0"`
+echo LOCATION FOR SCRIPTS $DIR
 SCRIPT=run_bowtie_align_unpaired.sh
-echo DIR $DIR
-echo BASE $BASE
-echo SCRIPT $SCRIPT
+echo SCRIPT TO BE RUN $SCRIPT
+THREADS=4
+echo THREADS $THREADS
+if [ -z "$GRIDCMD" ]; then
+    echo "GRIDCMD NOT SET, USING DEFAULT"
+    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -pe threaded ${THREADS} -l medium -l memory=1g -j y"
+else
+    echo "USING GRIDCMD ENVIRONMENT VARIABLE"
+    QSUB=${GRIDCMD}
+fi
+echo BASE GRID COMMAND $QSUB
 
 function runit () {
     echo "COMMAND"
@@ -32,11 +43,6 @@ function runit () {
     echo -n $?;    echo " exit status"
     date
 }
-
-THREADS=4
-echo WHICH QSUB
-which qsub
-QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -pe threaded ${THREADS} -l medium -l memory=1g -j y"
 
 ls -l *.${FILESUFFIX}
 for FASTQ in *.${FILESUFFIX} ; do

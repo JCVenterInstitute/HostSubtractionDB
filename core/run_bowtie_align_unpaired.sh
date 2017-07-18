@@ -7,15 +7,17 @@
 READSFILE=$1  # do include .fastq or .fastq.gz
 INDEXNAME=$2  # do not include .bt2
 SAM=$3        # do not include .sam or .bam
+THREADS=$4
 
-if [ $# != 3 ]
+if [ $# != 4 ]
    then
-   echo "Usage: 3 parameters"
+   echo "Usage: $0 <reads> <index> <sam> <threads>"
    exit 1
 fi
 echo READSFILE $READSFILE
 echo INDEXNAME $INDEXNAME
 echo SAM $SAM
+echo THREADS $THREADS
 
 # This is the command to align reads using the index.
 # The command has 'small' and 'large' binaries.
@@ -47,8 +49,6 @@ function runit () {
 # By default, bowtie uses "mixed mode", aligning separately if pair align fails.
 # For maximum sensitivity, map reads separately, not as pairs.
 
-THREADS="-p 4"
-#THREADS="-p 4 -mm"
 #ALIGNMENT="--end-to-end "
 ALIGNMENT="--sensitive-local"
 FASTQ="-q  --phred33"
@@ -62,7 +62,7 @@ UNALIGNED="--un R2.${MYBASE}.u.fq"
 UNALIGNED="--no-unal"                # keep unaligned out of the sam file
 
 echo "RUN ALIGNER"
-CMD="${BOWTIE_ALIGN} ${UNALIGNED} ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEXNAME} -U ${READSFILE} -S ${SAM}.sam"
+CMD="${BOWTIE_ALIGN} ${UNALIGNED} -p ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEXNAME} -U ${READSFILE} -S ${SAM}.sam"
 runit
 
 echo "CONVERT SAM TO BAM"
