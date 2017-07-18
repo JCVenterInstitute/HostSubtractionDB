@@ -16,7 +16,7 @@ fi
 HERE=`pwd`
 echo CURRENT DIRECTORY $HERE
 BASE=`basename "$0"`
-echo THIS PROGRAM IS $BASE
+echo "THIS PROGRAM IS ${BASE}"
 DIR=`dirname "$0"`
 if [ "${DIR}" == "." ]; then
     echo "ERROR SCRIPT MUST BE INVOKED WITH ABSOLUTE PATH"
@@ -28,6 +28,7 @@ echo SCRIPT TO BE RUN $SCRIPT
 if [ -z "$GRIDCMD" ]; then
     echo "GRIDCMD NOT SET, USING DEFAULT"
     QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l medium -l memory=1g -j y"
+    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l memory=1g -j y"
 else
     echo "USING GRIDCMD ENVIRONMENT VARIABLE"
     QSUB=${GRIDCMD}

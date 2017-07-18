@@ -8,24 +8,24 @@ OUT_PREFIX=$4
 OUT_R1=${OUT_PREFIX}.${IN_R1}
 OUT_R2=${OUT_PREFIX}.${IN_R2}
 
-echo "GET READS FROM ${IN_R1} AND ${IN_R2}"
-echo "GET MAPS FROM ${IN_BAM}"
-echo "WRITE READS TO ${OUT_R1} AND ${OUT_R2}"
-
 HERE=`pwd`
-echo CURRENT DIRECTORY $HERE
+echo "CURRENT DIRECTORY ${HERE}"
 BASE=`basename "$0"`
-echo THIS PROGRAM IS $BASE
+echo "THIS PROGRAM IS ${BASE}"
 DIR=`dirname "$0"`
 if [ "${DIR}" == "." ]; then
     echo "ERROR SCRIPT MUST BE INVOKED WITH ABSOLUTE PATH"
     exit 2
 fi
-echo LOCATION FOR SCRIPTS $DIR
+echo "LOCATION FOR SCRIPTS ${DIR}"
 SAMTOOLS=/usr/local/bin/samtools
 FILTER=fastq-filter-by-name.pl
 echo SAMTOOLS $SAMTOOLS
 echo FILTER $FILTER
+
+echo "GET READS FROM ${IN_R1} AND ${IN_R2}"
+echo "GET MAPS FROM ${IN_BAM}"
+echo "WRITE READS TO ${OUT_R1} AND ${OUT_R2}"
 
 function runit () {
     echo "COMMAND"
