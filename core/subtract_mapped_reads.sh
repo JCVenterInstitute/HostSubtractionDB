@@ -59,7 +59,7 @@ OUTFILE="${OUT_PREFIX}.${IN_BAM}.ids"
 # The command above complains the bam must be indexed, but only if run by expanding CMD.
 # The invocation below is a work-around.
 echo "SAMTOOLS TO EXTRACT MAPPED READ IDs..."
-#${SAMTOOLS} view ${IN_BAM} | cut -f 1 > ${OUT_PREFIX}.${IN_BAM}.ids
+${SAMTOOLS} view ${IN_BAM} | cut -f 1 > ${OUT_PREFIX}.${IN_BAM}.ids
 
 EXCLUDE="-v"  # option to exclude the named reads
 CMD="cat ${IN_R1} | ${DIR}/${FILTER} ${EXCLUDE} ${TMP_IDS_FILE} "
