@@ -27,8 +27,9 @@ SCRIPT=subtract_mapped_reads.sh
 echo SCRIPT TO BE RUN $SCRIPT
 if [ -z "$GRIDCMD" ]; then
     echo "GRIDCMD NOT SET, USING DEFAULT"
-    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l medium -l memory=1g -j y"
-    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l memory=1g -j y"
+    # memory requirement depends on fastq size. 2G is common.
+    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l medium -l memory=4g -j y"
+    QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -l memory=4g -j y"
 else
     echo "USING GRIDCMD ENVIRONMENT VARIABLE"
     QSUB=${GRIDCMD}
@@ -56,9 +57,11 @@ function runit () {
 for FF in ${BASE_PATTERN}.${READS_SUFFIX} ; do
     R1=${FF}
     R2=`echo ${R1} | sed 's/_R1_/_R2_/'`
-    BAM=`echo ${R1} | sed "s/.${READS_SUFFIX}/.${MAP_SUFFIX}/"`
-    echo R1 $R1 R2 $R2 BAM $BAM
-    CMD="${QSUB} -o ${HERE} ${DIR}/${SCRIPT} ${DIR} ${R1} ${R2} ${BAM} ${OUT_PREFIX}"
+    BAM1=`echo ${R1} | sed "s/.${READS_SUFFIX}/.${MAP_SUFFIX}/"`
+    BAM2=`echo ${R2} | sed "s/.${READS_SUFFIX}/.${MAP_SUFFIX}/"`
+    echo R1 $R1 R2 $R2
+    echo BAM1 $BAM BAM2 $BAM2
+    CMD="${QSUB} -o ${HERE} ${DIR}/${SCRIPT} ${DIR} ${R1} ${R2} ${BAM1} ${BAM2} ${OUT_PREFIX}"
     echo "GRID SUBMIT"
     echo $CMD
     runit

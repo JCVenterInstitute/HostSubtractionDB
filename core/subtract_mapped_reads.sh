@@ -1,11 +1,12 @@
 #!/bin/sh
 
-if [ $# != 5 ]; then echo "Usage: $0 <scripthome> <R1> <R2> <BAM> <out>"; exit 1; fi
+if [ $# != 6 ]; then echo "Usage: $0 <scripthome> <R1> <R2> <BAM1> <BAM2> <out>"; exit 1; fi
 DIR=$1
 IN_R1=$2
 IN_R2=$3
-IN_BAM=$4
-OUT_PREFIX=$5
+IN_BAM1=$4
+IN_BAM2=$5
+OUT_PREFIX=$6
 OUT_R1=${OUT_PREFIX}.${IN_R1}
 OUT_R2=${OUT_PREFIX}.${IN_R2}
 
@@ -23,7 +24,7 @@ echo SAMTOOLS $SAMTOOLS
 echo FILTER $FILTER
 
 echo "GET READS FROM ${IN_R1} AND ${IN_R2}"
-echo "GET MAPS FROM ${IN_BAM}"
+echo "GET MAPS FROM ${IN_BAM1} AND ${IN_BAM2}"
 echo "WRITE READS TO ${OUT_R1} AND ${OUT_R2}"
 
 function runit () {
@@ -50,15 +51,23 @@ function runit () {
 
 # For subtraction, we found that any filter is too restrictive.
 
-TMP_IDS_FILE="${OUT_PREFIX}.${IN_BAM}.ids"
-
-CMD="${SAMTOOLS} view ${IN_BAM} | cut -f 1 "
-OUTFILE="${OUT_PREFIX}.${IN_BAM}.ids"
-# runit
-# The command above complains the bam must be indexed, but only if run by expanding CMD.
-# The invocation below is a work-around.
 echo "SAMTOOLS TO EXTRACT MAPPED READ IDs..."
-${SAMTOOLS} view ${IN_BAM} | cut -f 1 > ${OUT_PREFIX}.${IN_BAM}.ids
+# The code below complains the bam must be indexed, but only if run by expanding CMD.
+###CMD="${SAMTOOLS} view ${IN_BAM} | cut -f 1 "
+###OUTFILE="${OUT_PREFIX}.${IN_BAM}.ids"
+###runit
+#
+# The invocation below is a work-around.
+TMP_IDS_FILE="tmp.${IN_BAM1}.${IN_BAM2}.ids"
+echo BAM1   # start a new file with R1 IDs
+${SAMTOOLS} view ${IN_BAM1} | cut -f 1 >  ${TMP_IDS_FILE}
+echo BAM2   # append to same file with R2 IDs
+${SAMTOOLS} view ${IN_BAM1} | cut -f 1 >> ${TMP_IDS_FILE}
+
+# This script assumes R1 and R2 of a pair have the same ID.
+# If either R1 or R2 mapped, then the ID is saved, and both reads will get subtracted.
+# For read pairs with distinct names like 1234/1 and 1234/2,
+# user must strip the suffixes from the deflines.
 
 EXCLUDE="-v"  # option to exclude the named reads
 CMD="cat ${IN_R1} | ${DIR}/${FILTER} ${EXCLUDE} ${TMP_IDS_FILE} "
