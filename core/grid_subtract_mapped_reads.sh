@@ -14,7 +14,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 HERE=`pwd`
-echo CURRENT DIRECTORY $HERE
+echo "CURRENT DIRECTORY ${HERE}"
 BASE=`basename "$0"`
 echo "THIS PROGRAM IS ${BASE}"
 DIR=`dirname "$0"`
@@ -63,7 +63,6 @@ for FF in ${BASE_PATTERN}.${READS_SUFFIX} ; do
     echo BAM1 $BAM BAM2 $BAM2
     CMD="${QSUB} -o ${HERE} ${DIR}/${SCRIPT} ${DIR} ${R1} ${R2} ${BAM1} ${BAM2} ${OUT_PREFIX}"
     echo "GRID SUBMIT"
-    echo $CMD
     runit
 done
 

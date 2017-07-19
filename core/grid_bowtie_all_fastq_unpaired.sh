@@ -17,9 +17,9 @@ echo INDEXNAME $INDEXNAME
 # Process the R1 and R2 that are no longer paired.
 
 HERE=`pwd`
-echo CURRENT DIRECTORY $HERE
+echo "CURRENT DIRECTORY ${HERE}"
 BASE=`basename "$0"`
-echo THIS PROGRAM IS $BASE
+echo "THIS PROGRAM IS ${BASE}"
 DIR=`dirname "$0"`
 echo LOCATION FOR SCRIPTS $DIR
 SCRIPT=run_bowtie_align_unpaired.sh
@@ -27,6 +27,7 @@ echo SCRIPT TO BE RUN $SCRIPT
 THREADS=4
 echo THREADS $THREADS
 if [ -z "$GRIDCMD" ]; then
+    # total memory = threads * memory
     echo "GRIDCMD NOT SET, USING DEFAULT"
     QSUB="qsub -cwd -b n -A DHSSDB -P 8370 -N human1 -pe threaded ${THREADS} -l medium -l memory=1g -j y"
 else
@@ -35,24 +36,15 @@ else
 fi
 echo BASE GRID COMMAND $QSUB
 
-function runit () {
-    echo "COMMAND"
-    echo ${CMD}
-    date
-    nice ${CMD}
-    echo -n $?;    echo " exit status"
-    date
-}
-
-ls -l *.${FILESUFFIX}
 for FASTQ in *.${FILESUFFIX} ; do
     echo FASTQ $FASTQ
     PREFIX=`echo ${FASTQ} | sed "s/.${FILESUFFIX}//" `
     echo PREFIX $PREFIX
-    CMD="${QSUB} -o $HERE ${DIR}/${SCRIPT} ${FASTQ} ${INDEXNAME} ${PREFIX}"
+    CMD="${QSUB} -o $HERE ${DIR}/${SCRIPT} ${FASTQ} ${INDEXNAME} ${PREFIX} ${THREADS}"
     echo "GRID SUBMIT"
     echo $CMD
-    runit
+    ${CMD}
+    echo -n $?;    echo " exit status"
 done
 
 echo "DONE"

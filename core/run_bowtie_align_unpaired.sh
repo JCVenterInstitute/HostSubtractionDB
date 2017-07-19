@@ -9,8 +9,7 @@ INDEXNAME=$2  # do not include .bt2
 SAM=$3        # do not include .sam or .bam
 THREADS=$4
 
-if [ $# != 4 ]
-   then
+if [ $# != 4 ];   then
    echo "Usage: $0 <reads> <index> <sam> <threads>"
    exit 1
 fi
