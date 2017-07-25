@@ -48,7 +48,7 @@ echo BAM1   # start a new file with R1 IDs
 ${SAMTOOLS} view ${IN_BAM1} | cut -f 1 >  ${TMP_IDS_FILE}
 echo -n $?; echo " exit status"
 echo BAM2   # append to same file with R2 IDs
-${SAMTOOLS} view ${IN_BAM1} | cut -f 1 >> ${TMP_IDS_FILE}
+${SAMTOOLS} view ${IN_BAM2} | cut -f 1 >> ${TMP_IDS_FILE}
 echo -n $?; echo " exit status"
 
 # This script assumes R1 and R2 of a pair have the same ID.
