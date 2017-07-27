@@ -49,6 +49,7 @@ for FF in *.${READS_SUFFIX} ; do
     READS=${FF}
     echo READS $READS
     FASTA=`echo $READS | sed "s/.$READS_SUFFIX/.fasta/"`
+    echo "CONVERTING $READS TO $FASTA"
     awk '{if (++C ==5)C=1; if (C==1) print ">" substr($1,2); if (C==2) print $0;}' $READS > $FASTA
     CMD="${QSUB} -o ${HERE} ${DIR}/${SCRIPT} ${FASTA}"
     echo "GRID SUBMIT"
