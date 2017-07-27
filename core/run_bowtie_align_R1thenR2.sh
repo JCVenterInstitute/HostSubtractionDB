@@ -3,6 +3,12 @@
 # Given reads and a reference, generate given alignment file.
 # CPU optimiation: Align R1, then subtract mates of mapped reads from R2, then align R2.
 
+if [ $# != 6 ];   then
+    echo "ERROR. WRONG NUMBER OF PARAMETERS: $#"
+    echo "Usage: $0 <scriptdir> <reads1> <reads2> <index> <prefix> <threads>"
+   exit 1
+fi
+
 SCRIPTDIR=$1   # path to other scripts
 READSFILE1=$2  # do include .fastq or .fastq.gz
 READSFILE2=$3  # do include .fastq or .fastq.gz
@@ -10,11 +16,6 @@ INDEXNAME=$4   # do not include .bt2
 PREFIX=$5      # example: "human"; we will output human.reads.bam and not-human.reads.fastq
 THREADS=$6     # usually 4
 
-if [ $# != 6 ];   then
-    echo "ERROR. WRONG NUMBER OF PARAMETERS"
-    echo "Usage: $0 <scriptdir> <reads1> <reads2> <index> <prefix> <threads>"
-   exit 1
-fi
 echo SCRIPTDIR $SCRIPTDIR
 echo READSFILE1 $READSFILE1
 echo READSFILE2 $READSFILE2
@@ -52,6 +53,8 @@ SAM2="${PREFIX}.${READSFILE2}.sam"
 BAM2="${PREFIX}.${READSFILE2}.bam"
 TMP_R2_FILE="tmp.${READSFILE2}"
 TMP_IDS_FILE="tmp.${READSFILE1}.mapped_ids"
+IN_R1_FILE="${READSFILE1}.fastq"
+IN_R2_FILE="${READSFILE2}.fastq"
 OUT_R1_FILE="not.${PREFIX}.${READSFILE1}.fastq"
 OUT_R2_FILE="not.${PREFIX}.${READSFILE2}.fastq"
 
@@ -80,7 +83,7 @@ FASTQ="-q  --phred33"
 UNALIGNED="--no-unal"                # keep unaligned out of the sam file
 
 echo "ALIGN THE R1 READS"
-CMD="${BOWTIE_ALIGN} ${UNALIGNED} -p ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEXNAME} -U ${READSFILE1} -S ${SAM1}"
+CMD="${BOWTIE_ALIGN} ${UNALIGNED} -p ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEXNAME} -U ${IN_R1_FILE} -S ${SAM1}"
 runit
 
 echo "CONVERT R1 SAM TO BAM"
@@ -94,7 +97,7 @@ ${SAMTOOLS} view ${BAM1} | cut -f 1 >  ${TMP_IDS_FILE}
 echo -n $?; echo " exit status"
 
 echo "FILTER R2 READS TO KEEP THOSE NOT MAPPED SO FAR"
-${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${READSFILE2} > ${TMP_R2_FILE}
+${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${IN_R2_FILE} > ${TMP_R2_FILE}
 echo -n $?; echo " exit status"
 
 echo "MAP FILTERED R2 READS"
@@ -112,11 +115,11 @@ ${SAMTOOLS} view ${BAM2} | cut -f 1 >>  ${TMP_IDS_FILE}
 echo -n $?; echo " exit status"
 
 echo "FILTER R1 READS TO KEEP PAIRS NOT MAPPED"
-${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${READSFILE1} > ${OUT_R1_FILE}
+${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${IN_R1_FILE} > ${OUT_R1_FILE}
 echo -n $?; echo " exit status"
 
 echo "FILTER R2 READS TO KEEP PAIRS NOT MAPPED"
-${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${READSFILE2} > ${OUT_R2_FILE}
+${FULLPATH} ${EXCLUDE} ${TMP_IDS_FILE} < ${IN_R2_FILE} > ${OUT_R2_FILE}
 echo -n $?; echo " exit status"
 
 CMD="rm -v ${TMP_R2_FILE}"
