@@ -1,12 +1,11 @@
 #!/bin/sh
 
-if [ $# != 6 ]; then echo "Usage: $0 <scripthome> <R1> <R2> <BAM1> <BAM2> <out>"; exit 1; fi
+if [ $# != 5 ]; then echo "Usage: $0 <scripthome> <R1> <R2> <BAM> <out>"; exit 1; fi
 DIR=$1
 IN_R1=$2
 IN_R2=$3
-IN_BAM1=$4
-IN_BAM2=$5
-OUT_PREFIX=$6
+IN_BAM=$4
+OUT_PREFIX=$5
 OUT_R1=${OUT_PREFIX}.${IN_R1}
 OUT_R2=${OUT_PREFIX}.${IN_R2}
 
@@ -24,7 +23,7 @@ echo SAMTOOLS $SAMTOOLS
 echo FILTER $FILTER
 
 echo "GET READS FROM ${IN_R1} AND ${IN_R2}"
-echo "GET MAPS FROM ${IN_BAM1} AND ${IN_BAM2}"
+echo "GET MAPS FROM ${IN_BAM}"
 echo "WRITE READS TO ${OUT_R1} AND ${OUT_R2}"
 
 # This filter requires mapQ>=5 on both reads.
@@ -43,12 +42,9 @@ echo "WRITE READS TO ${OUT_R1} AND ${OUT_R2}"
 # For subtraction, we found that any filter is too restrictive.
 
 echo "SAMTOOLS TO EXTRACT MAPPED READ IDs..."
-TMP_IDS_FILE="tmp.${IN_BAM1}.${IN_BAM2}.ids"
-echo BAM1   # start a new file with R1 IDs
-${SAMTOOLS} view ${IN_BAM1} | cut -f 1 >  ${TMP_IDS_FILE}
-echo -n $?; echo " exit status"
-echo BAM2   # append to same file with R2 IDs
-${SAMTOOLS} view ${IN_BAM2} | cut -f 1 >> ${TMP_IDS_FILE}
+TMP_IDS_FILE="tmp.${IN_BAM}.ids"
+echo BAM   # start a new file with R1 IDs
+${SAMTOOLS} view ${IN_BAM} | cut -f 1 >  ${TMP_IDS_FILE}
 echo -n $?; echo " exit status"
 
 # This script assumes R1 and R2 of a pair have the same ID.

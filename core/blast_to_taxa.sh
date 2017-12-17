@@ -19,6 +19,8 @@ if [ "${DIR}" == "." ]; then
     exit 2
 fi
 echo "SCRIPT DIRECTORY IS ${DIR}"
+DATADIR=` echo $DIR | sed 's/core$/data/' `
+echo "DATA DIRECTDORY IS ${DATADIR}"
 # This is a derivative of the NCBI file, containing ID TAXON, sorted, possibly with duplicate IDs
 # cat names.dmp | awk -F '|' '{if ($1 != p) print $1, $2 ; p=$1;}' | sort -k1,1 > ncbi_taxonomy.taxdb.id_name.txt
 TAXDB=ncbi_taxonomy.taxdb.id_name.txt
@@ -32,7 +34,7 @@ cat $BLAST_REPORT |\
     grep -v "hits found" | grep -v "^--" |\
     cut -f 9 | sort | uniq -c | sort -k2,2 > $TEMPFILE
 echo MAKE OUT FILE $OUTFILE
-join -1 2 ${TEMPFILE} ${DIR}/${TAXDB} | sort -k2,2n > $OUTFILE
+join -1 2 ${TEMPFILE} ${DATADIR}/${TAXDB} | sort -k2,2n > $OUTFILE
 
 echo "OUTPUT FIELDS: TAXON_ID READ_COUNT TAXON_NAME"
 echo done

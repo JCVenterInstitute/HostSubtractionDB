@@ -9,8 +9,8 @@
 
 HERE=`pwd`
 THIS=`basename "$0"`
-SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB
-SDB_UTIL=${SDB_HOME}/proc/subtract_mapped_reads.sh
+SDB_HOME=/local/ifs2_projdata/8370/projects/DHSSDB/GitHubRepo/HostSubtractionDB/core
+SDB_UTIL=${SDB_HOME}/subtract_mapped_reads.sh
 
 # This is the command to align reads using the index.
 # The command has 'small' and 'large' binaries.
@@ -50,8 +50,8 @@ else
     JOB=${SGE_TASK_ID}
 fi
 
-TARGET=SDB.fasta
-INDEX=SDB
+TARGET=bugs.fasta
+INDEX=bugs
 
 if [ ${JOB} -eq 0 ]; then
     # Create the index, submit alignments to the grid, and stop.
@@ -63,7 +63,7 @@ if [ ${JOB} -eq 0 ]; then
     ### runit
     
     echo "Bowtie align on grid"
-    CMD="${QSUB} -cwd -b n -A DHSSDB -P 8370 -N human1 -pe threaded 4 -l medium -l memory=1g -t 1-12 -j y -o $HERE ${HERE}/${THIS}"
+    CMD="${QSUB} -cwd -b n -A DHSSDB -P 8370 -N humsdb -pe threaded 4 -l medium -l memory=2g -t 1-12 -j y -o $HERE ${HERE}/${THIS}"
     echo $CMD
     $CMD
     echo "Jobs sent to grid"
@@ -118,10 +118,10 @@ BASE[11]=HUH.RIBO.SEND
 BASE[12]=HUH.NONE.SEND
 
 MYBASE=${BASE[${JOB}]}
-SAM=${MYBASE}.sam
-BAM=${MYBASE}.bam
-MYR1=${R1[${JOB}]}.gz
-MYR2=${R2[${JOB}]}.gz
+SAM=bugs.${MYBASE}.sam
+BAM=bugs.${MYBASE}.bam
+MYR1=nonsdb.trim.pair.cutadapt.${R1[${JOB}]}
+MYR2=nonsdb.trim.pair.cutadapt.${R2[${JOB}]}
 MYNAMES=${MYBASE}.read_names
 echo INDEX $INDEX
 echo MYR1 $MYR1
@@ -138,13 +138,13 @@ ALIGNMENT="--sensitive-local"
 FASTQ="-q  --phred33"
 
 UNALIGNED="--no-unal"                # keep unaligned out of the sam file
-CMD="${BOWTIE_ALIGN} ${UNALIGNED} ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEX} -1 ${MYR1} -2 ${MYR2} -S sdb.${SAM}"
+CMD="${BOWTIE_ALIGN} ${UNALIGNED} ${THREADS} ${ALIGNMENT} ${FASTQ} -x ${INDEX} -1 ${MYR1} -2 ${MYR2} -S ${SAM}"
 runit
 
 echo "CONVERT SAM TO BAM"
 THREADS="-@ 4"
 TEMP=TEMP.${JOB}
-CMD="${SAMTOOLS} view -h -b -o sdb.${BAM} sdb.${SAM} "
+CMD="${SAMTOOLS} view -h -b -o ${BAM} ${SAM} "
 runit
 
 #echo "GET MAPPED READ NAMES"
@@ -153,17 +153,12 @@ runit
 # to strip off any read-specific suffix like /1 or /2
 # ${SAMTOOLS} view R1.${BAM} | cut -f 1  > ${MYNAMES}
 
-echo "SUBTRACT MAPPED READS"
-${SAMTOOLS} view sdb.${BAM} | cut -f 1  > ${MYNAMES}
-CMD="${SDB_UTIL} ${MYR1} ${MYNAMES} nonhost.${MYBASE}.R1.fastq"
+echo "GET UNMAPPED READS"
+CMD="${SDB_UTIL} ${SDB_HOME} ${MYR1} ${MYR2} ${BAM} unknown"
 runit
-${SAMTOOLS} view R2.${BAM} | cut -f 1  > ${MYNAMES}   # overwrite
-CMD="${SDB_UTIL} ${MYR2} ${MYNAMES} nonhost.${MYBASE}.R2.fastq"
-runit
-rm ${MYNAMES} # cleanup
 
 echo "COMPRESS FASTQ"
-CMD="gzip -v nonhost.${MYBASE}.fastq"
+CMD="gzip -v unknown.*.fastq"
 runit
 
 echo "DONE"

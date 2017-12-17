@@ -17,7 +17,7 @@ echo ADAPT ${ADAPT}
 
 cp -v ${JPATH}/${APATH}/${ADAPT} .
 
-PATTERN="*_R1_*.fastq.gz"
+PATTERN="*_R1_*.fastq"
 echo "WORKING ON FILES LIKE"
 echo PATTERN ${PATTERN}
 
